@@ -1,0 +1,62 @@
+# Maintainer: Haltia <noreply@github.com>
+# GStreamer's webrtcbin and libgstwebrtcnice, the two parts of
+# gst-plugins-bad that Alpine 3.24 cannot build with its libnice 0.1.22.
+# Built from the same gst-plugins-bad release as Alpine's and tied to it,
+# against libnice >= 0.1.23 from haltia-de/libnice.
+pkgname=haltia-gst-webrtc
+pkgver=1.28.3
+pkgrel=0
+pkgdesc="GStreamer WebRTC element (webrtcbin) for Alpine's gst-plugins-bad"
+url="https://github.com/haltia-de/gst-webrtc"
+arch="all"
+license="LGPL-2.1-or-later"
+depends="gst-plugins-bad~$pkgver libnice>=0.1.23 libnice-gstreamer>=0.1.23"
+makedepends="
+	glib-dev
+	gst-plugins-base-dev
+	gstreamer-dev
+	libnice-dev>=0.1.23
+	libsrtp-dev
+	meson
+	openssl-dev
+	"
+options="!check" # no tests are built; the element is checked on the tablet
+source="https://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-$pkgver.tar.xz"
+builddir="$srcdir/gst-plugins-bad-$pkgver"
+
+build() {
+	# Everything off except webrtc and the plugins it insists on (dtls,
+	# srtp, sctp; Alpine ships them) and the libraries it links (gst-libs
+	# are always built). Only the two new files are packaged.
+	# Not abuild-meson: it turns every auto feature on.
+	meson setup \
+		--prefix=/usr \
+		--libdir=lib \
+		--buildtype=plain \
+		--wrap-mode=nodownload \
+		-Db_pie=true \
+		--auto-features=disabled \
+		-Dwebrtc=enabled \
+		-Ddtls=enabled \
+		-Dsrtp=enabled \
+		-Dsctp=enabled \
+		-Dintrospection=disabled \
+		-Dtests=disabled \
+		-Dexamples=disabled \
+		-Dtools=disabled \
+		-Ddoc=disabled \
+		-Dnls=disabled \
+		output
+	meson compile -C output
+}
+
+package() {
+	DESTDIR="$builddir/stage" meson install --no-rebuild -C output
+	install -Dm755 "$builddir"/stage/usr/lib/gstreamer-1.0/libgstwebrtc.so \
+		"$pkgdir"/usr/lib/gstreamer-1.0/libgstwebrtc.so
+	cp -a "$builddir"/stage/usr/lib/libgstwebrtcnice-1.0.so.* "$pkgdir"/usr/lib/
+}
+
+sha512sums="
+34a66ad2e8186cc9b609495520951c7ca748be450d3b012e67e1af12d7fb915ba3eb75c131e4179829f462bb3554e62e19c01cab75b573e6a17116b3c238847b  gst-plugins-bad-$pkgver.tar.xz
+"
