@@ -2,7 +2,7 @@
 
 `haltia-gst-webrtc`: GStreamer's WebRTC element (`webrtcbin`, the plugin
 `libgstwebrtc.so`) and its ICE library `libgstwebrtcnice-1.0` for Alpine
-3.24 armv7, for voice calls on the Haltia tablet (Lenovo YOGA Tablet 10,
+3.24 armv7, for voice and video calls on the Haltia tablet (Lenovo YOGA Tablet 10,
 [device-lenovo-b8000h](https://github.com/haltia-de/device-lenovo-b8000h)).
 
 Alpine's gst-plugins-bad 1.28.3 is built without them: they need libnice
