@@ -1,15 +1,25 @@
 # The release (ADR 0002 in haltia-de/haltia): a vX.Y.Z tag (the GStreamer
-# version) builds the signed armv7 packages and puts them into the GitHub
-# release.
+# version) builds the signed armv7 and aarch64 packages and puts them into
+# the GitHub release. Run by hand with a released tag, it adds the packages
+# of the architectures given to that release (the tag stays as it is).
 name: release
 on:
   push:
     tags: ["v*.*.*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: the release to add packages to (vX.Y.Z)
+        required: true
+      arch:
+        description: the architectures to build for it
+        default: aarch64
 permissions:
   contents: write
 jobs:
   apk:
     uses: haltia-de/ci/.github/workflows/apk.yml@v1
     with:
-      arch: armv7
+      arch: ${{ inputs.arch || 'armv7 aarch64' }}
+      tag: ${{ inputs.tag }}
     secrets: inherit
