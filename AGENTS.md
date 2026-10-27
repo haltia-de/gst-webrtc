@@ -20,7 +20,10 @@ Alpine's gst-plugins-bad, so the version must be exactly Alpine's.
   updates GStreamer, release this package at the new version.
 - Build dependency `libnice-dev>=0.1.23` comes from haltia-de/libnice
   through the Haltia apk repository: release libnice first.
-- A release is a `vX.Y.Z` tag equal to `pkgver` (with `pkgrel=0`).
+- A release is a `vX.Y.Z` tag equal to `pkgver` (with `pkgrel=0`). It
+  builds armv7 and aarch64 (`release.yml`). To add an architecture to a
+  release already out, run `release.yml` by hand with that `tag` and `arch`.
+  x86_64 needs libnice released for x86_64 first.
 - After a release, pin it in device-lenovo-b8000h's
   `linux-port/apps/packages.lock`.
 - Check on the tablet: `gst-inspect-1.0 webrtcbin nicesrc opusenc pulsesrc`.
